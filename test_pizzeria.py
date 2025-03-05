@@ -1,4 +1,5 @@
 import unittest
+from unittest.mock import MagicMock
 from pizzeria import Pizza, CartePizzeria, CartePizzeriaException
 
 class TestCartePizzeria(unittest.TestCase):
@@ -27,6 +28,33 @@ class TestCartePizzeria(unittest.TestCase):
         """Test de la suppression d'une pizza qui n'existe pas (doit lever une exception)."""
         with self.assertRaises(CartePizzeriaException):
             self.carte.remove_pizza("Hawaïenne")
+
+
+class TestCartePizzeriaAvecMock(unittest.TestCase):
+    def setUp(self):
+        """Initialisation d'une carte de pizzeria avec un mock."""
+        self.carte = CartePizzeria()
+        self.pizza_mock = MagicMock(spec=Pizza)
+        self.pizza_mock.nom = "MockPizza"
+        self.pizza_mock.ingredients = ["Fromage", "Tomate"]
+        self.pizza_mock.prix = 9.99
+
+    def test_ajout_pizza_mock(self):
+        """Test l'ajout d'une pizza mockée dans la carte."""
+        self.carte.add_pizza(self.pizza_mock)
+        self.assertEqual(self.carte.nb_pizzas(), 1)
+
+    def test_suppression_pizza_mock(self):
+        """Test la suppression d'une pizza mockée."""
+        self.carte.add_pizza(self.pizza_mock)
+        self.carte.remove_pizza("MockPizza")
+        self.assertTrue(self.carte.is_empty())
+
+    def test_suppression_pizza_mock_inexistante(self):
+        """Test la suppression d'une pizza qui n'existe pas (mock)."""
+        with self.assertRaises(CartePizzeriaException):
+            self.carte.remove_pizza("PizzaFantôme")
+
 
 if __name__ == "__main__":
     unittest.main()
